@@ -57,6 +57,8 @@ export default function Scene() {
     const canvas = canvasRef.current;
     const layer = layerRef.current;
     const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 760px)").matches;
+    const DPR_CAP = isMobile ? 1.25 : 1.5;
 
     // surface fatal errors on the page — the user can screenshot them
     const toast = document.createElement("div");
@@ -86,10 +88,10 @@ export default function Scene() {
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, DPR_CAP));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 0.95;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#1c1b19");
@@ -100,23 +102,23 @@ export default function Scene() {
 
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    if ("environmentIntensity" in scene) scene.environmentIntensity = 0.35;
+    if ("environmentIntensity" in scene) scene.environmentIntensity = 0.15;
 
-    scene.add(new THREE.AmbientLight("#2a2822", 0.7));
-    const key = new THREE.DirectionalLight("#fff2dd", 1.6);
+    scene.add(new THREE.AmbientLight("#2a2822", 0.5));
+    const key = new THREE.DirectionalLight("#fff2dd", 1.0);
     key.position.set(0.4, -0.5, 0.8);
     scene.add(key);
-    const rimAmber = new THREE.PointLight(AMBER, 5, 3);
+    const rimAmber = new THREE.PointLight(AMBER, 3.5, 3);
     rimAmber.position.set(-0.4, 0.25, 0.25);
     scene.add(rimAmber);
-    const rimIvory = new THREE.PointLight(IVORY, 3, 3);
+    const rimIvory = new THREE.PointLight(IVORY, 2, 3);
     rimIvory.position.set(0.4, 0.35, 0.15);
     scene.add(rimIvory);
 
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.35, 0.55, 0.82);
-    composer.addPass(bloom);
+    const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.55, 0.85);
+    if (!isMobile) composer.addPass(bloom); // bloom is the heaviest pass — skip on phones
     composer.addPass(new OutputPass());
 
     // ------------------------------------------------ rig + state
@@ -203,7 +205,7 @@ export default function Scene() {
     const activeSections = new Set(["one"]);
 
     // ------------------------------------------------ particles
-    const PARTICLE_COUNT = 22000;
+    const PARTICLE_COUNT = isMobile ? 12000 : 22000;
     function buildParticles(phone) {
       spinner.updateWorldMatrix(true, true);
       const origins = new Float32Array(PARTICLE_COUNT * 3);
@@ -247,7 +249,7 @@ export default function Scene() {
         uProgress: { value: 0 },
         uOpacity: { value: 0 },
         uTime: { value: 0 },
-        uSize: { value: 3.4 * Math.min(window.devicePixelRatio, 1.5) },
+        uSize: { value: 3.4 * DPR_CAP },
       };
       const mat = new THREE.ShaderMaterial({
         uniforms: particleUniforms,
@@ -352,6 +354,10 @@ export default function Scene() {
           o.material = makeScreenMaterial();
         } else if (o.material) {
           materials[o.material.name || o.name] = o.material;
+          if (o.material.isMeshStandardMaterial) {
+            // keep reflections subdued — full env intensity reads as glare
+            o.material.envMapIntensity = o.name.includes("Lens") ? 0.7 : 0.4;
+          }
           if (o.name.startsWith("Antenna") && o.material.color) {
             o.material.color.set("#17150f");
             o.material.roughness = 0.75;
