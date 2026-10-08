@@ -462,23 +462,24 @@ export default function Scene() {
         onUpdate: extra.onUpdate,
       });
     };
+    const MOBILE = !isDesktop();
     watch("one",
-      () => setPose({ x: isDesktop() ? 0.05 : 0, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: 1, dim: 0 }),
+      () => setPose({ x: isDesktop() ? 0.05 : 0, y: MOBILE ? -0.06 : 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.35 : 0 }),
       undefined);
     watch("colorways",
-      () => setPose({ x: isDesktop() ? 0.06 : 0, y: 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35, scale: 1, dim: 0 }),
-      () => setPose({ x: isDesktop() ? 0.05 : 0, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: 1, dim: 0 }));
+      () => setPose({ x: isDesktop() ? 0.06 : 0, y: MOBILE ? -0.09 : 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.3 : 0 }),
+      () => setPose({ x: isDesktop() ? 0.05 : 0, y: MOBILE ? -0.06 : 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.35 : 0 }));
     watch("specs",
-      () => setPose({ x: isDesktop() ? 0.13 : 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: 1, dim: 0 }),
-      () => setPose({ x: isDesktop() ? 0.06 : 0, y: 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35, scale: 1, dim: 0 }),
+      () => setPose({ x: isDesktop() ? 0.13 : 0, y: MOBILE ? -0.08 : 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.28 : 0 }),
+      () => setPose({ x: isDesktop() ? 0.06 : 0, y: MOBILE ? -0.09 : 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.3 : 0 }),
       { start: "top 70%", end: "bottom 40%", scrub: true,
         onUpdate: (self) => { pose.explode = self.progress; } });
     watch("camera",
-      () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1, scale: 1, dim: 0 }),
-      () => setPose({ x: isDesktop() ? 0.13 : 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: 1, dim: 0 }));
+      () => setPose({ x: isDesktop() ? -0.05 : 0, y: MOBILE ? -0.09 : 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.3 : 0 }),
+      () => setPose({ x: isDesktop() ? 0.13 : 0, y: MOBILE ? -0.08 : 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.28 : 0 }));
     watch("reserve",
-      () => setPose({ x: isDesktop() ? 0.12 : 0, y: 0.05, ry: 0.15, rx: 0, explode: 0, spin: 0, scale: 0.72, dim: 0.7 }),
-      () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1 }));
+      () => setPose({ x: isDesktop() ? 0.12 : 0, y: isDesktop() ? 0.05 : -0.02, ry: 0.15, rx: 0, explode: 0, spin: 0, scale: 0.72, dim: 0.7 }),
+      () => setPose({ x: isDesktop() ? -0.05 : 0, y: MOBILE ? -0.09 : 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1, scale: MOBILE ? 0.78 : 1, dim: MOBILE ? 0.3 : 0 }));
 
     // track which sections are on screen for callouts
     const sectionIO = new IntersectionObserver((entries) => {
