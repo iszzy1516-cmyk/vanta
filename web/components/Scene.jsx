@@ -477,7 +477,7 @@ export default function Scene() {
       () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1, scale: 1, dim: 0 }),
       () => setPose({ x: isDesktop() ? 0.13 : 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: 1, dim: 0 }));
     watch("reserve",
-      () => setPose({ x: isDesktop() ? 0.12 : 0, y: 0.02, ry: 0.15, rx: 0, explode: 0, spin: 0, scale: 0.72, dim: 0.55 }),
+      () => setPose({ x: isDesktop() ? 0.12 : 0, y: 0.05, ry: 0.15, rx: 0, explode: 0, spin: 0, scale: 0.72, dim: 0.7 }),
       () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1 }));
 
     // track which sections are on screen for callouts

@@ -254,7 +254,7 @@ export default function Page() {
         </section>
 
         {/* RESERVE */}
-        <section id="reserve" className="min-h-[92vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24">
+        <section id="reserve" className="min-h-[85vh] flex flex-col justify-end gap-7 px-6 md:px-16 pt-24 pb-14">
           <h2 className="font-grotesk font-bold text-[clamp(30px,4vw,54px)]">
             Own the night.
           </h2>
