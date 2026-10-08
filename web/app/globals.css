@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --graphite: #1c1b19;
+  --surface: #242320;
+  --bone: #edeae2;
+  --mist: #9a958a;
+  --amber: #e8a33d;
+  --hairline: #3a382f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--graphite);
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--graphite);
+}
+
+/* engineering grid behind everything */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(237, 234, 226, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237, 234, 226, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 75%);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* dimension callout leader lines */
+.leader-line {
+  stroke: var(--amber);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.leader-text {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--bone);
+  white-space: nowrap;
+}
+.leader-tag {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+}
+
+/* loader calibration sweep */
+@keyframes calibrate {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(320%); }
+}
+.calibrate-sweep {
+  animation: calibrate 1.1s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .calibrate-sweep {
+    animation: none;
+    transform: translateX(0);
+    width: 100% !important;
+  }
+}
+
+/* amber signal pulse travelling the rim — subtle CSS echo on the CTA */
+.btn-primary {
+  transition: transform 0.18s ease, box-shadow 0.3s ease;
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  box-shadow: 0 0 0 1px var(--amber), 0 6px 28px rgba(232, 163, 61, 0.28);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.swatch {
+  transition: border-color 0.25s, box-shadow 0.3s, transform 0.2s;
+}
+.swatch:hover {
+  transform: translateY(-2px);
+}
+.swatch.is-active {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px var(--amber), 0 4px 22px rgba(232, 163, 61, 0.25);
+}
+
+/* fallback video for no-WebGL */
+.fallback-video {
+  display: none;
+}
+body.no-webgl .fallback-video {
+  display: block;
+}
+body.no-webgl #stage {
+  display: none;
+}

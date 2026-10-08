@@ -1,4 +1,5 @@
 node_modules/
 .next/
-*.blend1
+out/
 .DS_Store
+*.blend1
