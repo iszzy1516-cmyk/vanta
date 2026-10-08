@@ -130,7 +130,7 @@ export default function Page() {
 
       <main className="relative z-10 pointer-events-none">
         {/* HERO */}
-        <section id="one" className="min-h-screen flex flex-col justify-center gap-10 px-6 md:px-16 pt-28 pb-16 max-md:justify-start max-md:pb-[50vh] max-md:bg-gradient-to-b max-md:from-graphite max-md:via-graphite/85 max-md:to-transparent">
+        <section id="one" className="min-h-screen flex flex-col justify-center gap-10 px-6 md:px-16 pt-28 pb-16">
           <div className="max-w-3xl grid gap-7 pointer-events-auto">
             <p className="font-mono text-xs tracking-[0.25em] text-amber">INSTRUMENT 01 — NIGHT VISION PHONE</p>
             <h1 className="font-grotesk font-bold leading-[1.04] text-[clamp(42px,6.6vw,88px)]">
@@ -172,7 +172,7 @@ export default function Page() {
         </section>
 
         {/* COLORWAYS */}
-        <section id="colorways" className="min-h-[92vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24 max-md:justify-start max-md:pt-24 max-md:pb-[48vh] max-md:bg-gradient-to-b max-md:from-graphite max-md:via-graphite/85 max-md:to-transparent">
+        <section id="colorways" className="min-h-[92vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24">
           <h2 className="font-grotesk font-bold text-[clamp(30px,4vw,54px)] max-w-xl">
             Three finishes. One instrument.
           </h2>
@@ -203,7 +203,7 @@ export default function Page() {
         </section>
 
         {/* SPECS + exploded view */}
-        <section id="specs" className="min-h-[110vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24 max-md:justify-start max-md:pt-24 max-md:pb-[48vh] max-md:bg-gradient-to-b max-md:from-graphite max-md:via-graphite/85 max-md:to-transparent">
+        <section id="specs" className="min-h-[110vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24">
           <h2 className="font-grotesk font-bold text-[clamp(30px,4vw,54px)] max-w-xl">
             Engineered absence.
           </h2>
@@ -229,7 +229,7 @@ export default function Page() {
         </section>
 
         {/* CAMERA */}
-        <section id="camera" className="min-h-[92vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24 md:items-end md:text-right max-md:justify-start max-md:pt-24 max-md:pb-[48vh] max-md:bg-gradient-to-b max-md:from-graphite max-md:via-graphite/85 max-md:to-transparent">
+        <section id="camera" className="min-h-[92vh] flex flex-col justify-center gap-7 px-6 md:px-16 py-24 md:items-end md:text-right">
           <h2 className="font-grotesk font-bold text-[clamp(30px,4vw,54px)] max-w-xl">
             Sees more in the dark.
           </h2>
@@ -254,7 +254,7 @@ export default function Page() {
         </section>
 
         {/* RESERVE */}
-        <section id="reserve" className="min-h-[85vh] flex flex-col justify-end gap-7 px-6 md:px-16 pt-24 pb-14 max-md:bg-gradient-to-t max-md:from-graphite max-md:via-graphite/85 max-md:to-transparent">
+        <section id="reserve" className="min-h-[85vh] flex flex-col justify-end gap-7 px-6 md:px-16 pt-24 pb-14">
           <h2 className="font-grotesk font-bold text-[clamp(30px,4vw,54px)]">
             Own the night.
           </h2>
