@@ -58,16 +58,35 @@ export default function Scene() {
     const layer = layerRef.current;
     const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // surface fatal errors on the page — the user can screenshot them
+    const toast = document.createElement("div");
+    toast.style.cssText =
+      "position:fixed;left:12px;bottom:12px;z-index:200;max-width:70vw;" +
+      "font:12px/1.5 monospace;background:#3a1212;color:#ffb3b3;padding:10px 14px;" +
+      "border:1px solid #ff5470;border-radius:8px;white-space:pre-wrap;display:none";
+    document.body.appendChild(toast);
+    let toasted = false;
+    const showToast = (msg) => {
+      if (toasted) return;
+      toasted = true;
+      toast.style.display = "block";
+      toast.textContent = "VANTA diagnostic: " + msg;
+    };
+    const onGlobalError = (e) => showToast(e.message + " @ " + (e.filename || "").split("/").pop() + ":" + e.lineno);
+    window.addEventListener("error", onGlobalError);
+    window.addEventListener("unhandledrejection", (e) => showToast("promise: " + (e.reason && e.reason.message || e.reason)));
+
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      canvas.addEventListener("webglcontextlost", () => showToast("WebGL context lost by the browser"));
     } catch (e) {
       document.body.classList.add("no-webgl");
       window.dispatchEvent(new CustomEvent("vanta:ready"));
       return;
     }
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
@@ -101,7 +120,7 @@ export default function Scene() {
     composer.addPass(new OutputPass());
 
     // ------------------------------------------------ rig + state
-    const pose = { x: 0.05, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2 };
+    const pose = { x: 0.05, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: 1, dim: 0 };
     const intro = { v: 0 };
     const root = new THREE.Group();
     const spinner = new THREE.Group();
@@ -228,7 +247,7 @@ export default function Scene() {
         uProgress: { value: 0 },
         uOpacity: { value: 0 },
         uTime: { value: 0 },
-        uSize: { value: 3.4 * Math.min(window.devicePixelRatio, 2) },
+        uSize: { value: 3.4 * Math.min(window.devicePixelRatio, 1.5) },
       };
       const mat = new THREE.ShaderMaterial({
         uniforms: particleUniforms,
@@ -357,13 +376,15 @@ export default function Scene() {
 
       spinner.add(phone);
       meshGroup = phone;
-      console.log("[vanta] meshes:", Object.keys(index).length,
-        "| screen shader:", Boolean(index.Screen && index.Screen.material && index.Screen.material.isShaderMaterial),
-        "| screen name:", index.Screen ? index.Screen.name : "MISSING",
-        "| uv:", index.Screen && index.Screen.geometry.attributes.uv ? "ok" : "NONE");
       phone.scale.setScalar(1.08);
       phone.rotation.x = Math.PI / 2; // stand up: screen (glTF +Y) faces camera
       buildParticles(phone);
+
+      // cache callout anchors once — avoids per-frame scene traversal
+      for (const id of Object.keys(calloutEls)) {
+        const found = phone.getObjectByName(calloutEls[id].def.anchor);
+        if (found) calloutEls[id].anchor = found;
+      }
 
       // intro: parts fly in along their explode axes, then settle
       intro.v = 0;
@@ -436,21 +457,21 @@ export default function Scene() {
       });
     };
     watch("one",
-      () => setPose({ x: isDesktop() ? 0.05 : 0, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2 }),
+      () => setPose({ x: isDesktop() ? 0.05 : 0, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: 1, dim: 0 }),
       undefined);
     watch("colorways",
-      () => setPose({ x: isDesktop() ? 0.06 : 0, y: 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35 }),
-      () => setPose({ x: isDesktop() ? 0.05 : 0, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2 }));
+      () => setPose({ x: isDesktop() ? 0.06 : 0, y: 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35, scale: 1, dim: 0 }),
+      () => setPose({ x: isDesktop() ? 0.05 : 0, y: 0, ry: 0.55, rx: 0.1, explode: 0, spin: 0.2, scale: 1, dim: 0 }));
     watch("specs",
-      () => setPose({ x: isDesktop() ? 0.13 : 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0 }),
-      () => setPose({ x: isDesktop() ? 0.06 : 0, y: 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35 }),
+      () => setPose({ x: isDesktop() ? 0.13 : 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: 1, dim: 0 }),
+      () => setPose({ x: isDesktop() ? 0.06 : 0, y: 0.02, ry: 0.9, rx: 0.16, explode: 0, spin: 0.35, scale: 1, dim: 0 }),
       { start: "top 70%", end: "bottom 40%", scrub: true,
         onUpdate: (self) => { pose.explode = self.progress; } });
     watch("camera",
-      () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1 }),
-      () => setPose({ x: 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0 }));
+      () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1, scale: 1, dim: 0 }),
+      () => setPose({ x: isDesktop() ? 0.13 : 0, y: 0.01, ry: 0.4, rx: 0.42, explode: 0, spin: 0, scale: 1, dim: 0 }));
     watch("reserve",
-      () => setPose({ x: 0, y: -0.01, ry: 0, rx: 0, explode: 0, spin: 0.06 }),
+      () => setPose({ x: isDesktop() ? 0.12 : 0, y: 0.02, ry: 0.15, rx: 0, explode: 0, spin: 0, scale: 0.72, dim: 0.55 }),
       () => setPose({ x: isDesktop() ? -0.05 : 0, y: 0, ry: Math.PI - 0.55, rx: 0.08, explode: 0, spin: 0.1 }));
 
     // track which sections are on screen for callouts
@@ -478,6 +499,10 @@ export default function Scene() {
     const clock = new THREE.Clock();
     const proj = new THREE.Vector3();
     let raf = 0;
+    let canvasDim = 1;
+    let lastIntro = -1;
+    let lastEx = -1;
+    let frameCount = 0;
 
     const smooth = (t) => t * t * (3 - 2 * t);
 
@@ -499,42 +524,61 @@ export default function Scene() {
       root.position.y += ((pose.y + Math.sin(t * 0.8) * 0.004) - root.position.y) * 0.06;
       root.rotation.y += (pose.ry + drag.userY - root.rotation.y) * 0.08;
       root.rotation.x += (pose.rx + drag.userX - root.rotation.x) * 0.08;
+      const targetScale = 1.08 * (pose.scale || 1);
+      root.scale.x += (targetScale - root.scale.x) * 0.06;
+      root.scale.y = root.scale.z = root.scale.x;
+      const targetDim = 1 - (pose.dim || 0);
+      if (Math.abs(canvasDim - targetDim) > 0.002) {
+        canvasDim += (targetDim - canvasDim) * 0.08;
+        canvas.style.opacity = canvasDim.toFixed(3);
+      }
 
       rimAmber.position.x = -0.4 + Math.sin(t * 0.4) * 0.12 + mouse.x * 0.08;
 
       screenUniforms.uTime.value += dt * (REDUCED ? 0.15 : 1);
       if (particleUniforms) particleUniforms.uTime.value = t;
 
-      // part positions: intro assembly + scroll explode
+      // part positions: intro assembly + scroll explode — skip when settled
       const exScroll = smooth(pose.explode);
-      for (const p of parts) {
-        const pi = smooth(THREE.MathUtils.clamp((intro.v - p.delay) / (1 - p.delay), 0, 1));
-        const e = Math.max(1 - pi, exScroll);
-        p.obj.position.set(
-          p.base.x + p.off.x * e,
-          p.base.y + p.off.y * e,
-          p.base.z + p.off.z * e,
-        );
+      if (Math.abs(intro.v - lastIntro) > 0.0004 || Math.abs(exScroll - lastEx) > 0.0004) {
+        lastIntro = intro.v;
+        lastEx = exScroll;
+        for (const p of parts) {
+          const pi = smooth(THREE.MathUtils.clamp((intro.v - p.delay) / (1 - p.delay), 0, 1));
+          const e = Math.max(1 - pi, exScroll);
+          p.obj.position.set(
+            p.base.x + p.off.x * e,
+            p.base.y + p.off.y * e,
+            p.base.z + p.off.z * e,
+          );
+        }
       }
 
-      // callouts track their anchors
+      // callouts track their anchors (desktop only — cached anchors, throttled)
+      frameCount++;
+      const showCallouts = isDesktop();
       for (const id of Object.keys(calloutEls)) {
         const c = calloutEls[id];
-        const anchor = meshGroup?.getObjectByName(c.def.anchor);
-        const visible = anchor && activeSections.has(c.def.section) && intro.v > 0.92 && !transitioning;
-        c.el.style.opacity = visible ? "1" : "0";
-        if (!visible) continue;
-        proj.set(...c.def.local);
+        const anchor = c.anchor;
+        const visible = showCallouts && anchor && activeSections.has(c.def.section) && intro.v > 0.92 && !transitioning;
+        if (!visible) {
+          if (c.shown) { c.el.style.opacity = "0"; c.shown = false; }
+          continue;
+        }
+        if (!c.shown) { c.el.style.opacity = "1"; c.shown = true; }
+        proj.set(c.def.local[0], c.def.local[1], c.def.local[2]);
         anchor.localToWorld(proj);
         proj.project(camera);
+        if (proj.z > 1) {
+          c.el.style.opacity = "0";
+          c.shown = false;
+          continue;
+        }
         const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
         const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
-        const behind = proj.z > 1;
-        if (behind) { c.el.style.opacity = "0"; continue; }
-        // flip label side near right edge
         const flip = sx > window.innerWidth * 0.72;
         const lx = flip ? -150 : 14;
-        c.el.style.transform = `translate(${sx}px, ${sy}px)`;
+        c.el.style.transform = `translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px)`;
         c.line.setAttribute("x2", String(lx));
         c.line.setAttribute("y2", "-1");
         const tag = c.el.querySelector(".leader-tag");
@@ -542,7 +586,11 @@ export default function Scene() {
         tag.style.textAlign = flip ? "right" : "left";
       }
 
-      composer.render();
+      try {
+        composer.render();
+      } catch (err) {
+        showToast("render: " + err.message);
+      }
     }
     tick();
 
@@ -550,6 +598,8 @@ export default function Scene() {
     return () => {
       cancelAnimationFrame(raf);
       clearInterval(pulseTimer);
+      window.removeEventListener("error", onGlobalError);
+      toast.remove();
       ScrollTrigger.getAll().forEach((st) => st.kill());
       sectionIO.disconnect();
       canvas.removeEventListener("pointerdown", onPointerDown);

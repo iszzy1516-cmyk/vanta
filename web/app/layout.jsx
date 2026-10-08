@@ -22,7 +22,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${grotesk.variable} ${mono.variable}`}>
-      <body className="bg-graphite text-bone font-grotesk antialiased">
+      <body className="bg-graphite text-bone font-grotesk antialiased overflow-x-hidden">
         {children}
       </body>
     </html>

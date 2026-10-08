@@ -150,12 +150,6 @@ export default function Page() {
               >
                 Reserve Vanta One
               </a>
-              <button
-                type="button"
-                className="text-mist hover:text-bone border-b border-hairline hover:border-amber pb-1 transition-colors text-base"
-              >
-                Drag the phone
-              </button>
             </div>
             <p className="text-mist text-sm">From $999 — ships March 2027</p>
           </div>
@@ -268,7 +262,7 @@ export default function Page() {
             Reservations open March 2027. Leave your email and we will wake you
             when the dark ships.
           </p>
-          <form id="reserveForm" noValidate className="flex gap-4 flex-wrap pointer-events-auto">
+          <form id="reserveForm" noValidate className="flex flex-col sm:flex-row gap-4 pointer-events-auto w-full sm:w-auto">
             <label htmlFor="email" className="sr-only">Email address</label>
             <input
               id="email"
@@ -276,9 +270,9 @@ export default function Page() {
               type="email"
               required
               placeholder="you@night.owl"
-              className="px-7 py-4 rounded-full border border-hairline bg-surface/80 text-bone text-base outline-none focus:border-amber min-w-[min(340px,70vw)] transition-colors"
+              className="px-7 py-4 rounded-full border border-hairline bg-surface/80 text-bone text-base outline-none focus:border-amber w-full sm:w-[340px] transition-colors"
             />
-            <button type="submit" className="btn-primary px-9 py-4 rounded-full bg-amber text-graphite font-semibold text-base">
+            <button type="submit" className="btn-primary px-9 py-4 rounded-full bg-amber text-graphite font-semibold text-base w-full sm:w-auto">
               Reserve
             </button>
           </form>
